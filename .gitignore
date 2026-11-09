@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+
+# Runtime databases
+*.sqlite3
+*.db
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Generated / local research output
+survey/results/
+experiments/results/*.local.*
+*.log
+
+# OS and editor noise
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AuthLab{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Signed in with {{ user.session_method|replace('_', ' ') }}</p>
+    <h1>{{ user.username }}</h1>
+    <p class="lede">Session and credential state, straight from the database.</p>
+  </div>
+  <span class="pill good">session active</span>
+</section>
+
+{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+{% if user.session_method == 'recovery_code' %}
+  <div class="warn-box">
+    You are in a recovery session. Set a new password and rotate TOTP before
+    continuing.
+    <form method="post" action="{{ url_for('recovery.recovery_change_password') }}" class="form inline-form">
+      <input name="password" type="password" placeholder="New password" required>
+      <input name="confirm" type="password" placeholder="Confirm" required>
+      <button class="btn primary small" type="submit">Set password</button>
+    </form>
+  </div>
+{% endif %}
+
+<div class="grid two">
+  <section class="card">
+    <h2>WebAuthn credentials</h2>
+    {% if credentials %}
+    <table class="table">
+      <thead><tr><th>Label</th><th>Kind</th><th>BE/BS</th><th>Counter</th><th>Last used</th><th></th></tr></thead>
+      <tbody>
+      {% for c in credentials %}
+        <tr>
+          <td>{{ c.label }}</td>
+          <td>{{ c.kind }}</td>
+          <td>{{ 'BE' if c.backup_eligible else '—' }} / {{ 'BS' if c.backup_state else '—' }}</td>
+          <td>{{ c.sign_count }}</td>
+          <td class="small muted">{{ c.last_used and (c.last_used|int) or 'never' }}</td>
+          <td>
+            <form method="post" action="{{ url_for('passkeys.revoke_credential', credential_id=c.id) }}"
+                  onsubmit="return confirm('Revoke this credential?')">
+              <button class="linklike danger" type="submit">revoke</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="muted">No WebAuthn credentials. Add one below.</p>
+    {% endif %}
+    <div class="button-row">
+      <button id="dashboard-enroll-passkey" class="btn primary small" type="button">Add passkey</button>
+      <button id="dashboard-enroll-hardware" class="btn small" type="button">Add hardware key</button>
+    </div>
+    <div id="enroll-status" class="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>Account recovery</h2>
+    <p><strong>{{ recovery_left }}</strong> unused recovery code(s).</p>
+    <p class="muted small">Recovery codes are a single-use fallback. After a
+       password reset, every session is revoked and TOTP is rotated.</p>
+    <a class="btn small" href="{{ url_for('recovery.recovery_home') }}">Open recovery</a>
+    <form method="post" action="{{ url_for('recovery.revoke_everything') }}"
+          onsubmit="return confirm('Revoke ALL credentials, codes, and sessions?')">
+      <button class="btn small danger" type="submit">Revoke everything</button>
+    </form>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Recent sessions</h2>
+  <table class="table compact">
+    <thead><tr><th>Method</th><th>Created</th><th>Expires</th><th>State</th></tr></thead>
+    <tbody>
+    {% for s in sessions %}
+      <tr>
+        <td>{{ s.method }}</td>
+        <td class="small muted">{{ s.created_at|int }}</td>
+        <td class="small muted">{{ s.expires_at|int }}</td>
+        <td>{{ 'revoked' if s.revoked else 'active' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Audit log</h2>
+  <table class="table compact">
+    <thead><tr><th>Event</th><th>Method</th><th>OK</th><th>Detail</th></tr></thead>
+    <tbody>
+    {% for a in audit %}
+      <tr>
+        <td>{{ a.event }}</td>
+        <td>{{ a.method or '—' }}</td>
+        <td>{{ '✓' if a.success else '✗' }}</td>
+        <td class="small muted">{{ a.detail }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('dashboard-enroll-passkey').addEventListener('click', function () {
+    AuthLab.enroll('passkey');
+  });
+  document.getElementById('dashboard-enroll-hardware').addEventListener('click', function () {
+    AuthLab.enroll('hardware');
+  });
+</script>
+{% endblock %}

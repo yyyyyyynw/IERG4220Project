@@ -1,0 +1,26 @@
+id,label,category,method,method_label,direction,trials,successes,raw_successes,rate,wilson_low,wilson_high,mean_ms,median_ms,interpretation
+P1,Password + TOTP relay,phishing,password_totp,Password + TOTP,attack_success,5,5,5,1.0,0.5655,1.0,46.923,46.614,Attack succeeded 5/5 (100%); lower is better.
+P1b,Replay phished TOTP,replay,password_totp,Password + TOTP,defense_blocked,5,5,0,1.0,0.5655,1.0,,,Defence held in 5/5 (100%); higher is better.
+P1c,Expired TOTP,replay,password_totp,Password + TOTP,defense_blocked,3,3,0,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.
+P1d,Naive TOTP double use,replay,password_totp,Password + TOTP,attack_success,5,5,5,1.0,0.5655,1.0,,,Without server-side replay state the same code worked twice (5/5).
+P2,"Passkey, lookalike RP ID",phishing,synced_passkey,Synced passkey,defense_blocked,3,3,0,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.
+P3,"Passkey, strict origin relay",phishing,synced_passkey,Synced passkey,defense_blocked,5,5,0,1.0,0.5655,1.0,,,Defence held in 5/5 (100%); higher is better.
+P4,"Passkey, permissive origin relay",phishing,synced_passkey,Synced passkey,attack_success,5,5,5,1.0,0.5655,1.0,9.351,7.044,Attack succeeded 5/5 (100%); lower is better.
+P5,"Hardware, lookalike RP ID",phishing,hardware_key,Hardware FIDO2 key,defense_blocked,3,3,0,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.
+P6,"Hardware, strict origin relay",phishing,hardware_key,Hardware FIDO2 key,defense_blocked,5,5,0,1.0,0.5655,1.0,,,Defence held in 5/5 (100%); higher is better.
+P7,"Hardware, permissive origin relay",phishing,hardware_key,Hardware FIDO2 key,attack_success,5,5,5,1.0,0.5655,1.0,8.615,6.899,Attack succeeded 5/5 (100%); lower is better.
+R1,TOTP replay policy,replay,password_totp,Password + TOTP,defense_blocked,5,5,5,1.0,0.5655,1.0,,,Defence held in 5/5 (100%); higher is better.
+R2,TOTP time window,replay,password_totp,Password + TOTP,characterization,5,5,3,1.0,0.5655,1.0,,,"Only offsets −1, 0, +1 were accepted; ±2 were rejected."
+R3,Passkey assertion replay,replay,synced_passkey,Synced passkey,defense_blocked,3,3,3,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.
+R4,Hardware assertion replay,replay,hardware_key,Hardware FIDO2 key,defense_blocked,3,3,3,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.
+R5,Hardware counter regression,replay,hardware_key,Hardware FIDO2 key,defense_blocked,3,3,3,1.0,0.4385,1.0,8039.038,8035.273,Defence held in 3/3 (100%); higher is better.
+R6,Hardware forged high counter,replay,hardware_key,Hardware FIDO2 key,attack_success,3,3,3,1.0,0.4385,1.0,99.587,99.338,A forged counter above the stored value was accepted (3/3); counter checks catch only lagging clones.
+R7,Synced passkey counter policy,replay,synced_passkey,Synced passkey,task_success,3,3,3,1.0,0.4385,1.0,102.025,102.04,The synced credential was accepted under the relaxed counter policy.
+S1,Synced passkey restore,recovery,synced_passkey,Synced passkey,task_success,5,5,5,1.0,0.5655,1.0,101.593,102.057,Task completed in 5/5 (100%); higher is better.
+S2,Platform credential loss,recovery,synced_passkey,Synced passkey,characterization,3,3,3,1.0,0.4385,1.0,8038.066,8038.403,No credential remained; login was impossible in all trials.
+S3,Hardware key loss,recovery,hardware_key,Hardware FIDO2 key,characterization,3,3,3,1.0,0.4385,1.0,8036.749,8035.553,No credential remained; login was impossible in all trials.
+S4,Hardware backup key,recovery,hardware_key,Hardware FIDO2 key,task_success,3,3,3,1.0,0.4385,1.0,141.534,123.748,Task completed in 3/3 (100%); higher is better.
+S5,Hardware recovery code,recovery,hardware_key,Hardware FIDO2 key,task_success,3,3,3,1.0,0.4385,1.0,96.427,98.796,Task completed in 3/3 (100%); higher is better.
+S6,Recovery code reuse,recovery,all,All methods,defense_blocked,3,3,3,1.0,0.4385,1.0,,,The second use of the recovery code was rejected in all trials.
+S7,Email reset invariants,recovery,all,All methods,defense_blocked,3,3,3,1.0,0.4385,1.0,43.425,44.02,Defence held in 3/3 (100%); higher is better.
+S8,Expired reset token,recovery,all,All methods,defense_blocked,3,3,3,1.0,0.4385,1.0,,,Defence held in 3/3 (100%); higher is better.

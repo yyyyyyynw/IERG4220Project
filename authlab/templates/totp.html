@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}TOTP — AuthLab{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-copy">
+    <p class="eyebrow">Step 2 of 2</p>
+    <h1>Enter your TOTP code</h1>
+    <p>Signing in as <strong>{{ username }}</strong>. The server accepts a
+       ±1 time-step window and records the highest counter it has seen.</p>
+  </div>
+  <form class="card form" method="post" action="{{ url_for('auth.login_totp') }}">
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <label for="totp-code">6-digit code</label>
+    <input id="totp-code" name="code" inputmode="numeric" autocomplete="one-time-code"
+           pattern="[0-9]{6}" maxlength="6" autofocus required>
+    <button id="totp-submit" class="btn primary" type="submit">Verify and sign in</button>
+    <p class="small muted">TOTP is phishable in real time: a relay can submit
+       this code before the window closes.</p>
+  </form>
+</section>
+{% endblock %}

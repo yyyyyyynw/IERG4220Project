@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Sign in — AuthLab{% endblock %}
+{% block content %}
+<section class="auth-shell wide">
+  <div class="auth-copy">
+    <p class="eyebrow">Controlled comparison</p>
+    <h1>Sign in</h1>
+    <p>Choose a method. Each one is instrumented; failed and successful
+       ceremonies are written to the audit log.</p>
+  </div>
+  <div class="card">
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="password" role="tab">Password + TOTP</button>
+      <button class="tab" data-tab="passkey" role="tab">Synced passkey</button>
+      <button class="tab" data-tab="hardware" role="tab">Hardware key</button>
+    </div>
+
+    <section class="tabpane active" id="pane-password">
+      <form method="post" action="{{ url_for('auth.login_password') }}" class="form">
+        <label for="login-username">Username</label>
+        <input id="login-username" name="username" autocomplete="username" required>
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        <button id="login-password-submit" class="btn primary" type="submit">Continue to TOTP</button>
+      </form>
+    </section>
+
+    <section class="tabpane" id="pane-passkey">
+      <p class="muted">Uses a discoverable WebAuthn credential. No username is
+         typed; the authenticator returns the account handle.</p>
+      <button id="login-passkey" class="btn primary" type="button">Sign in with passkey</button>
+    </section>
+
+    <section class="tabpane" id="pane-hardware">
+      <label for="hardware-username">Username</label>
+      <input id="hardware-username" autocomplete="username" placeholder="username">
+      <p class="muted">A hardware key normally stores a non-resident credential,
+         so the account name is needed to build the allow-list.</p>
+      <button id="login-hardware" class="btn primary" type="button">Sign in with security key</button>
+    </section>
+
+    <div id="auth-status" class="status" aria-live="polite"></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tabpane').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('pane-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+  document.getElementById('login-passkey').addEventListener('click', function () {
+    AuthLab.loginWebAuthn('passkey');
+  });
+  document.getElementById('login-hardware').addEventListener('click', function () {
+    AuthLab.loginWebAuthn('hardware');
+  });
+</script>
+{% endblock %}

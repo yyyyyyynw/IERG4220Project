@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Account recovery — AuthLab{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Fallback path</p>
+    <h1>Account recovery</h1>
+    <p class="lede">Recovery is where strong authentication often quietly
+       degrades. Every path here is instrumented and single-use.</p>
+  </div>
+</section>
+
+<div class="grid two">
+  <section class="card form">
+    <h2>Email reset token</h2>
+    {% if message %}<div class="flash info">{{ message }}</div>{% endif %}
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <form method="post" action="{{ url_for('recovery.recovery_home') }}">
+      <label for="recovery-username">Username</label>
+      <input id="recovery-username" name="username" value="{{ username or '' }}" required>
+      <button id="recovery-request-submit" class="btn primary" type="submit">Send reset link</button>
+    </form>
+    {% if reset_link %}
+      <div class="warn-box">
+        <strong>Demo email.</strong> In production this link is emailed. It is
+        shown here so the experiment can follow it.
+        <a id="reset-link" href="{{ reset_link }}">{{ reset_link }}</a>
+      </div>
+    {% endif %}
+    <p class="small muted">Tokens are 256-bit, hashed at rest, expire in 15
+       minutes, and are consumed atomically.</p>
+  </section>
+
+  <section class="card form">
+    <h2>Recovery code</h2>
+    <p class="muted">Each code is stored with scrypt and is valid once.</p>
+    <form method="post" action="{{ url_for('recovery.recovery_code_login') }}">
+      <label for="recovery-code-username">Username</label>
+      <input id="recovery-code-username" name="username" required>
+      <label for="recovery-code">One-time code</label>
+      <input id="recovery-code" name="code" placeholder="XXXX-XXXX" autocomplete="off" required>
+      <button id="recovery-code-submit" class="btn primary" type="submit">Use recovery code</button>
+    </form>
+    <p class="small muted">If you have lost every authenticator, this is the
+       last self-service path. It intentionally does not require a passkey.</p>
+  </section>
+</div>
+{% endblock %}

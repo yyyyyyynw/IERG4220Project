@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Lab console — AuthLab{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Instrumentation</p>
+    <h1>Lab console</h1>
+    <p class="lede">The controlled experiments run from Python, not this page.
+       This page shows the configuration the testbed is using.</p>
+  </div>
+  <span class="pill {{ 'lab' if lab_mode else '' }}">{{ 'LAB MODE' if lab_mode else 'lab mode off' }}</span>
+</section>
+
+<div class="grid two">
+  <section class="card">
+    <h2>Relying party</h2>
+    <table class="table compact">
+      <tr><th>RP ID</th><td class="mono">{{ rp_id }}</td></tr>
+      <tr><th>Accepted origins</th><td class="mono">{{ origins|join(', ') }}</td></tr>
+      <tr><th>Counter policy</th><td class="mono">{{ counter_policy }}</td></tr>
+      <tr><th>Lab endpoints</th><td class="mono">/lab/* (token required)</td></tr>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Run the experiments</h2>
+    <pre class="code">python experiments/run_experiments.py
+python experiments/analyze.py</pre>
+    <p class="muted">Results are written to <code>experiments/results/</code>
+       and figures to <code>figures/</code>.</p>
+    <p class="small muted">The harness launches Chrome with CDP virtual
+       authenticators, so no physical security key is required.</p>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Scenarios</h2>
+  <table class="table compact">
+    <thead><tr><th>ID</th><th>Scenario</th><th>Method</th><th>Expected control</th></tr></thead>
+    <tbody>
+      <tr><td>P1</td><td>Real-time phishing relay</td><td>password+TOTP</td><td>fails only if replay/rate controls hold</td></tr>
+      <tr><td>P2</td><td>Naive lookalike origin</td><td>passkey / hardware</td><td>no credential for attacker RP ID</td></tr>
+      <tr><td>P3</td><td>Relay through lookalike subdomain, strict RP</td><td>passkey / hardware</td><td>origin check rejects</td></tr>
+      <tr><td>P4</td><td>Same relay, permissive RP</td><td>passkey / hardware</td><td>accepts — misconfiguration</td></tr>
+      <tr><td>R1</td><td>TOTP replay</td><td>password+TOTP</td><td>monotonic counter rejects</td></tr>
+      <tr><td>R2</td><td>WebAuthn assertion replay</td><td>passkey / hardware</td><td>challenge single-use rejects</td></tr>
+      <tr><td>S1</td><td>Sync to second device, lose first</td><td>synced passkey</td><td>restore succeeds</td></tr>
+      <tr><td>S2</td><td>Lose hardware key, no backup</td><td>hardware key</td><td>locked out</td></tr>
+      <tr><td>S3</td><td>Lose hardware key, use backup key / code</td><td>hardware key</td><td>recovery succeeds</td></tr>
+      <tr><td>A1</td><td>Email token replay / expiry / session revocation</td><td>all</td><td>single-use + revoke</td></tr>
+      <tr><td>U1</td><td>Ceremony latency and interaction cost</td><td>all</td><td>measured + KLM model</td></tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

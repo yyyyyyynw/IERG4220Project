@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}AuthLab — beyond TOTP{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Beyond TOTP</p>
+  <h1>Three ways to sign in.<br>Three different threat models.</h1>
+  <p class="lede">
+    A controlled testbed for comparing <strong>password + TOTP</strong>,
+    <strong>synced passkeys</strong>, and <strong>hardware FIDO2 keys</strong>
+    under phishing, replay, device loss, backup, and account recovery.
+  </p>
+  <div class="actions">
+    <a class="btn primary" href="{{ url_for('auth.register') }}">Create a test account</a>
+    <a class="btn" href="{{ url_for('auth.login') }}">Sign in</a>
+    {% if config.LAB_MODE %}<a class="btn ghost" href="{{ url_for('pages.lab') }}">Open lab console</a>{% endif %}
+  </div>
+</section>
+
+<section class="grid three">
+  <article class="card">
+    <span class="tag">Something you know</span>
+    <h2>Password + TOTP</h2>
+    <p>Phishable in real time. Replay protection depends on the verifier
+       enforcing a monotonic counter. Recovery usually collapses to email.</p>
+    <ul class="ticks">
+      <li class="bad">Not origin-bound</li>
+      <li class="bad">Codes can be relayed</li>
+      <li class="good">Works everywhere</li>
+    </ul>
+  </article>
+  <article class="card">
+    <span class="tag">Synced credential</span>
+    <h2>Synced passkey</h2>
+    <p>Origin-bound WebAuthn credential, end-to-end encrypted by the platform
+       sync fabric. Device loss is survivable; cloud-account compromise becomes
+       the recovery single point of failure.</p>
+    <ul class="ticks">
+      <li class="good">Phishing-resistant</li>
+      <li class="good">Survives device loss</li>
+      <li class="warn">Sync account is a SPOF</li>
+    </ul>
+  </article>
+  <article class="card">
+    <span class="tag">Something you have</span>
+    <h2>Hardware FIDO2 key</h2>
+    <p>Origin-bound, non-exportable key material and a monotonic signature
+       counter. No sync: loss requires a second key or a recovery code.</p>
+    <ul class="ticks">
+      <li class="good">Phishing-resistant</li>
+      <li class="good">Clone detection</li>
+      <li class="warn">Device loss is permanent</li>
+    </ul>
+  </article>
+</section>
+
+<section class="panel">
+  <h2>What the project measures</h2>
+  <div class="metrics">
+    <div><strong>Phishing</strong><span>real-time relay, lookalike origin, origin-check bugs</span></div>
+    <div><strong>Replay</strong><span>TOTP windows, challenge reuse, signature counters</span></div>
+    <div><strong>Recovery</strong><span>sync restore, backup key, email token, recovery codes</span></div>
+    <div><strong>Usability</strong><span>ceremony latency, interaction cost, KLM estimates</span></div>
+  </div>
+</section>
+{% endblock %}

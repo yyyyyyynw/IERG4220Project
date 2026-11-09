@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Create account — AuthLab{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-copy">
+    <p class="eyebrow">Step 1 of 2</p>
+    <h1>Create a test account</h1>
+    <p>You will get a TOTP secret and one-time recovery codes, then you can
+       enrol a platform passkey and/or a hardware security key.</p>
+    <p class="muted small">Use a disposable password. This is a research testbed.</p>
+  </div>
+  <form class="card form" method="post" action="{{ url_for('auth.register') }}">
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <label for="username">Username</label>
+    <input id="username" name="username" value="{{ username or '' }}" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="new-password" required>
+    <label for="confirm">Confirm password</label>
+    <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+    <p class="hint">At least 10 characters. Do not reuse a real password.</p>
+    <button id="register-submit" class="btn primary" type="submit">Create account</button>
+    <p class="small muted">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>.</p>
+  </form>
+</section>
+{% endblock %}

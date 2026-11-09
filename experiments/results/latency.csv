@@ -1,0 +1,10 @@
+task,n,mean_ms,median_ms,stdev_ms,min_ms,max_ms,p95_ms
+registration,10,389.1,388.8,4.5,382.7,399.3,399.3
+password_totp_login,10,157.6,157.6,3.4,152.1,163.4,163.4
+passkey_enroll,10,1024.9,1023.8,6.0,1016.9,1033.6,1033.6
+passkey_login,10,103.2,103.4,0.8,101.2,104.3,104.3
+hardware_enroll,10,1035.2,1031.3,8.3,1029.2,1055.5,1055.5
+hardware_login,10,99.6,99.9,3.1,93.1,105.4,105.4
+recovery_email_request,3,89.3,88.6,2.9,86.9,92.5,92.5
+recovery_email_reset,3,41.9,41.7,0.5,41.6,42.4,42.4
+recovery_code_login,3,90.7,93.5,5.5,84.4,94.2,94.2

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Reset password — AuthLab{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-copy">
+    <p class="eyebrow">Email token accepted</p>
+    <h1>Choose a new password</h1>
+    <p>Resetting for <strong>{{ username }}</strong>. This will revoke every
+       existing session, delete old recovery codes, and rotate the TOTP secret.</p>
+  </div>
+  <form class="card form" method="post" action="{{ url_for('recovery.reset', token=token) }}">
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <label for="reset-password">New password</label>
+    <input id="reset-password" name="password" type="password" autocomplete="new-password" required>
+    <label for="reset-confirm">Confirm</label>
+    <input id="reset-confirm" name="confirm" type="password" autocomplete="new-password" required>
+    <button id="reset-submit" class="btn primary" type="submit">Reset password</button>
+  </form>
+</section>
+{% endblock %}

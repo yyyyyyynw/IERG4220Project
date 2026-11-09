@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Enrol authenticators — AuthLab{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Step 2 of 2</p>
+    <h1>Enrol your authenticators</h1>
+    <p class="lede">The password/TOTP path is already active. Add a platform
+       passkey and/or a hardware security key to compare them.</p>
+  </div>
+  <a class="btn" href="{{ url_for('pages.dashboard') }}">Go to dashboard</a>
+</section>
+
+<div class="grid two">
+  <section class="card">
+    <h2>Authenticator app</h2>
+    <p class="muted">Scan this secret in any RFC 6238 TOTP app.</p>
+    <img class="qr" src="{{ qr }}" alt="TOTP QR code">
+    <p class="mono secret" id="totp-secret">{{ user.totp_secret }}</p>
+    <details>
+      <summary>Provisioning URI</summary>
+      <code class="uri">{{ uri }}</code>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>WebAuthn credentials</h2>
+    <p class="muted">Platform passkeys are syncable when the provider supports
+       it; hardware keys are device-bound.</p>
+    <div class="button-row">
+      <button id="enroll-passkey" class="btn primary" type="button">Add synced passkey</button>
+      <button id="enroll-hardware" class="btn" type="button">Add hardware key</button>
+    </div>
+    <div id="enroll-status" class="status" aria-live="polite"></div>
+    {% if credentials %}
+      <table class="table compact">
+        <thead><tr><th>Label</th><th>Kind</th><th>Backup</th><th>Counter</th></tr></thead>
+        <tbody>
+        {% for c in credentials %}
+          <tr>
+            <td>{{ c.label }}</td>
+            <td>{{ c.kind }}</td>
+            <td>{{ 'BE' if c.backup_eligible else 'device-bound' }}{% if c.backup_state %} / BS{% endif %}</td>
+            <td>{{ c.sign_count }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted small" id="no-credentials">No WebAuthn credentials yet.</p>
+    {% endif %}
+  </section>
+</div>
+
+<section class="card">
+  <h2>One-time recovery codes</h2>
+  {% if codes %}
+    <p class="warn-box">Save these now. They are shown once and each can be
+       used once. In a real deployment they would be downloaded or printed.</p>
+    <div class="codes" id="recovery-codes">
+      {% for code in codes %}<code>{{ code }}</code>{% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">Recovery codes are stored hashed. Regenerate them if you
+       did not save the originals.</p>
+  {% endif %}
+  <form method="post" action="{{ url_for('auth.regenerate_recovery_codes') }}"
+        onsubmit="return confirm('Invalidate all existing recovery codes?')">
+    <button class="btn small" type="submit">Regenerate recovery codes</button>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('enroll-passkey').addEventListener('click', function () {
+    AuthLab.enroll('passkey');
+  });
+  document.getElementById('enroll-hardware').addEventListener('click', function () {
+    AuthLab.enroll('hardware');
+  });
+</script>
+{% endblock %}
