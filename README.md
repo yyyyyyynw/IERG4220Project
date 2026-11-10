@@ -144,6 +144,7 @@ docs/
   SUMMARY_zh.md           Traditional Chinese executive summary
   INTERIM_REPORT.md       interim report for course submission
   INTERIM_REPORT.pdf      rendered A4 PDF of the interim report
+  DEMO_GUIDE_zh.md        step-by-step Traditional Chinese demo guide
   PROJECT_GUIDE_zh.pdf    15-page illustrated Chinese guide for collaborators
   threat_model.md         assets, adversaries, trust boundaries, attack trees
   protocol_analysis.md    message-level analysis and sequence diagrams
