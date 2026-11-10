@@ -1,11 +1,47 @@
 from __future__ import annotations
 
-from flask import Blueprint, current_app, render_template
+from urllib.parse import urlparse
+
+from flask import Blueprint, current_app, redirect, render_template, request, url_for
 
 from ..db import query_all, query_one
+from ..i18n import COOKIE_NAME, normalize_locale
 from ..security import current_user, require_login
 
 bp = Blueprint("pages", __name__)
+
+
+@bp.get("/language/<lang>")
+def language(lang: str):
+    """Persist the interface language and return to the current page."""
+    locale = normalize_locale(lang)
+
+    # The app sends ``Referrer-Policy: no-referrer``, so the toggle passes an
+    # explicit same-site return path. Only a local absolute path is accepted.
+    requested = request.args.get("next") or ""
+    referrer = request.referrer or ""
+    target = url_for("pages.index")
+
+    if (requested.startswith("/") and not requested.startswith("//")
+            and "\r" not in requested and "\n" not in requested):
+        target = requested
+    elif referrer:
+        parsed = urlparse(referrer)
+        if parsed.netloc == request.host:
+            target = parsed.path or url_for("pages.index")
+            if parsed.query:
+                target = f"{target}?{parsed.query}"
+
+    response = redirect(target)
+    response.set_cookie(
+        COOKIE_NAME,
+        locale,
+        max_age=60 * 60 * 24 * 365,
+        samesite="Lax",
+        httponly=True,
+        secure=request.is_secure,
+    )
+    return response
 
 
 @bp.get("/")

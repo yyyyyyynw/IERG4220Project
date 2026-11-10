@@ -1,25 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Create account — AuthLab{% endblock %}
+{% block title %}{{ t('register.title') }}{% endblock %}
 {% block content %}
 <section class="auth-shell">
   <div class="auth-copy">
-    <p class="eyebrow">Step 1 of 2</p>
-    <h1>Create a test account</h1>
-    <p>You will get a TOTP secret and one-time recovery codes, then you can
-       enrol a platform passkey and/or a hardware security key.</p>
-    <p class="muted small">Use a disposable password. This is a research testbed.</p>
+    <p class="eyebrow">{{ t('register.eyebrow') }}</p>
+    <h1>{{ t('register.h1') }}</h1>
+    <p>{{ t('register.lede') }}</p>
+    <p class="muted small">{{ t('register.muted') }}</p>
   </div>
   <form class="card form" method="post" action="{{ url_for('auth.register') }}">
-    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
-    <label for="username">Username</label>
+    {% if error %}<div class="flash error">{{ error|tr }}</div>{% endif %}
+    <label for="username">{{ t('register.username') }}</label>
     <input id="username" name="username" value="{{ username or '' }}" autocomplete="username" required>
-    <label for="password">Password</label>
+    <label for="password">{{ t('register.password') }}</label>
     <input id="password" name="password" type="password" autocomplete="new-password" required>
-    <label for="confirm">Confirm password</label>
+    <label for="confirm">{{ t('register.confirm') }}</label>
     <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
-    <p class="hint">At least 10 characters. Do not reuse a real password.</p>
-    <button id="register-submit" class="btn primary" type="submit">Create account</button>
-    <p class="small muted">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>.</p>
+    <p class="hint">{{ t('register.hint') }}</p>
+    <button id="register-submit" class="btn primary" type="submit">{{ t('register.submit') }}</button>
+    <p class="small muted">{{ t('register.have_account') }} <a href="{{ url_for('auth.login') }}">{{ t('register.signin') }}</a>.</p>
   </form>
 </section>
 {% endblock %}

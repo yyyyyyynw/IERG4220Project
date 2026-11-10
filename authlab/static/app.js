@@ -103,11 +103,30 @@
     try { sessionStorage.setItem("authlab.lastTiming", JSON.stringify(timing)); } catch (_) {}
   }
 
+  function tr(key, fallback) {
+    const dictionary = window.AuthLabI18n || {};
+    return Object.prototype.hasOwnProperty.call(dictionary, key)
+      ? dictionary[key]
+      : fallback;
+  }
+
+  function format(text, values) {
+    return text.replace(/\{(\w+)\}/g, function (match, name) {
+      return Object.prototype.hasOwnProperty.call(values, name) ? values[name] : match;
+    });
+  }
+
   function describeError(error) {
-    if (!error) return "Unknown error";
-    if (error.name === "NotAllowedError") return "Cancelled or no matching credential.";
-    if (error.name === "SecurityError") return "Security error: origin/RP ID mismatch.";
-    if (error.name === "InvalidStateError") return "This authenticator is already registered.";
+    if (!error) return tr("unknownError", "Unknown error");
+    if (error.name === "NotAllowedError") {
+      return tr("cancelled", "Cancelled or no matching credential.");
+    }
+    if (error.name === "SecurityError") {
+      return tr("securityError", "Security error: origin/RP ID mismatch.");
+    }
+    if (error.name === "InvalidStateError") {
+      return tr("alreadyRegistered", "This authenticator is already registered.");
+    }
     return error.name ? (error.name + ": " + error.message) : error.message;
   }
 
@@ -121,7 +140,7 @@
       const start = performance.now();
       this.lastTiming = { action: "enroll", kind: kind, start: start, ok: false };
       try {
-        setStatus("Waiting for authenticator…");
+        setStatus(tr("waiting", "Waiting for authenticator…"));
         const optionResponse = await postJSON("/webauthn/register/options", { kind: kind });
         const credential = await navigator.credentials.create({
           publicKey: prepareCreationOptions(optionResponse.options),
@@ -135,7 +154,10 @@
         this.lastTiming.end = performance.now();
         this.lastTiming.duration_ms = this.lastTiming.end - start;
         rememberTiming(this.lastTiming);
-        setStatus("Enrolled: " + result.credential.label, "ok");
+        setStatus(
+          format(tr("enrolled", "Enrolled: {label}"), { label: result.credential.label }),
+          "ok"
+        );
         window.setTimeout(function () { window.location.reload(); }, 700);
         return result;
       } catch (error) {
@@ -151,7 +173,7 @@
       const start = performance.now();
       this.lastTiming = { action: "login", kind: kind, start: start, ok: false };
       try {
-        setStatus("Waiting for authenticator…");
+        setStatus(tr("waiting", "Waiting for authenticator…"));
         const usernameEl = document.getElementById("hardware-username");
         const username = kind === "hardware" && usernameEl ? usernameEl.value.trim() : null;
         const optionResponse = await postJSON("/webauthn/login/options", {
@@ -172,7 +194,10 @@
         this.lastTiming.duration_ms = this.lastTiming.end - start;
         this.lastTiming.method = result.method;
         rememberTiming(this.lastTiming);
-        setStatus("Signed in as " + result.username, "ok");
+        setStatus(
+          format(tr("signedIn", "Signed in as {username}"), { username: result.username }),
+          "ok"
+        );
         window.location.href = result.redirect || "/dashboard";
         return result;
       } catch (error) {

@@ -1,21 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Password reset — AuthLab{% endblock %}
+{% block title %}{{ t('reset_done.title') }}{% endblock %}
 {% block content %}
 <section class="auth-shell wide">
   <div class="auth-copy">
-    <p class="eyebrow">Recovery complete</p>
-    <h1>Password reset</h1>
-    <p>All previous sessions were revoked. The TOTP secret was rotated, so
-       re-enrol your authenticator app with the new secret below.</p>
-    <a class="btn primary" href="{{ url_for('auth.login') }}">Continue to sign in</a>
+    <p class="eyebrow">{{ t('reset_done.eyebrow') }}</p>
+    <h1>{{ t('reset_done.h1') }}</h1>
+    <p>{{ t('reset_done.lede') }}</p>
+    <a class="btn primary" href="{{ url_for('auth.login') }}">{{ t('reset_done.continue') }}</a>
   </div>
   <div class="card">
-    <h2>New TOTP secret</h2>
-    <img class="qr" src="{{ qr }}" alt="New TOTP QR code">
+    <h2>{{ t('reset_done.new_secret') }}</h2>
+    <img class="qr" src="{{ qr }}" alt="{{ t('reset_done.qr_alt') }}">
     <p class="mono secret">{{ secret }}</p>
-    <p class="small muted">Passkeys were not deleted by the reset. This is a
-       deliberate choice: they are stronger than a password. Use “revoke all”
-       from the dashboard if the account is believed compromised.</p>
+    <p class="small muted">{{ t('reset_done.note') }}</p>
   </div>
 </section>
 {% endblock %}

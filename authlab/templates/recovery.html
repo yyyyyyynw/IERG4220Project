@@ -1,48 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Account recovery — AuthLab{% endblock %}
+{% block title %}{{ t('recovery.title') }}{% endblock %}
 {% block content %}
 <section class="page-head">
   <div>
-    <p class="eyebrow">Fallback path</p>
-    <h1>Account recovery</h1>
-    <p class="lede">Recovery is where strong authentication often quietly
-       degrades. Every path here is instrumented and single-use.</p>
+    <p class="eyebrow">{{ t('recovery.eyebrow') }}</p>
+    <h1>{{ t('recovery.h1') }}</h1>
+    <p class="lede">{{ t('recovery.lede') }}</p>
   </div>
 </section>
 
 <div class="grid two">
   <section class="card form">
-    <h2>Email reset token</h2>
-    {% if message %}<div class="flash info">{{ message }}</div>{% endif %}
-    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <h2>{{ t('recovery.email_reset') }}</h2>
+    {% if message %}<div class="flash info">{{ message|tr }}</div>{% endif %}
+    {% if error %}<div class="flash error">{{ error|tr }}</div>{% endif %}
     <form method="post" action="{{ url_for('recovery.recovery_home') }}">
-      <label for="recovery-username">Username</label>
+      <label for="recovery-username">{{ t('recovery.username') }}</label>
       <input id="recovery-username" name="username" value="{{ username or '' }}" required>
-      <button id="recovery-request-submit" class="btn primary" type="submit">Send reset link</button>
+      <button id="recovery-request-submit" class="btn primary" type="submit">{{ t('recovery.send_link') }}</button>
     </form>
     {% if reset_link %}
       <div class="warn-box">
-        <strong>Demo email.</strong> In production this link is emailed. It is
-        shown here so the experiment can follow it.
+        <strong>{{ t('recovery.demo_email') }}</strong> {{ t('recovery.demo_email_body') }}
         <a id="reset-link" href="{{ reset_link }}">{{ reset_link }}</a>
       </div>
     {% endif %}
-    <p class="small muted">Tokens are 256-bit, hashed at rest, expire in 15
-       minutes, and are consumed atomically.</p>
+    <p class="small muted">{{ t('recovery.token_note') }}</p>
   </section>
 
   <section class="card form">
-    <h2>Recovery code</h2>
-    <p class="muted">Each code is stored with scrypt and is valid once.</p>
+    <h2>{{ t('recovery.recovery_code') }}</h2>
+    <p class="muted">{{ t('recovery.code_desc') }}</p>
     <form method="post" action="{{ url_for('recovery.recovery_code_login') }}">
-      <label for="recovery-code-username">Username</label>
+      <label for="recovery-code-username">{{ t('recovery.username') }}</label>
       <input id="recovery-code-username" name="username" required>
-      <label for="recovery-code">One-time code</label>
+      <label for="recovery-code">{{ t('recovery.code_label') }}</label>
       <input id="recovery-code" name="code" placeholder="XXXX-XXXX" autocomplete="off" required>
-      <button id="recovery-code-submit" class="btn primary" type="submit">Use recovery code</button>
+      <button id="recovery-code-submit" class="btn primary" type="submit">{{ t('recovery.use_code') }}</button>
     </form>
-    <p class="small muted">If you have lost every authenticator, this is the
-       last self-service path. It intentionally does not require a passkey.</p>
+    <p class="small muted">{{ t('recovery.code_note') }}</p>
   </section>
 </div>
 {% endblock %}

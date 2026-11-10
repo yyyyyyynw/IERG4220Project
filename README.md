@@ -37,6 +37,15 @@ Touch ID / Windows Hello; a hardware key is a USB/NFC FIDO2 key.
 > Use `http://localhost:5010`, not `http://127.0.0.1:5010`: the default RP ID is
 > `localhost`, and a WebAuthn RP ID must be a suffix of the origin's host.
 
+### Interface language
+
+The UI supports English and Traditional Chinese (繁體中文). Use the
+`EN | 繁體中文` switch in the top bar; the choice is stored in the
+`authlab_lang` cookie for one year. English remains the default so the
+automated experiment harness is unaffected. All form IDs, field names,
+endpoints, and WebAuthn behaviour are identical in both languages; only
+presentation text changes. Translations live in `authlab/i18n.py`.
+
 ### Lab mode (what the experiments use)
 
 The experiment harness starts its own servers on loopback and does not need the
@@ -120,6 +129,7 @@ authlab/                  Flask testbed (RP, TOTP, recovery, lab controls)
   routes/passkeys.py      WebAuthn registration/authentication, origin policy
   routes/recovery.py      recovery codes, email reset, session revocation
   routes/lab.py           token-guarded test instrumentation
+  i18n.py                 English / Traditional Chinese UI catalog
   security.py             scrypt, RFC 6238 TOTP, sessions, flows
   webauthn_service.py     explicit py_webauthn wrappers and counter policy
   static/app.js           browser WebAuthn serialization + timing capture

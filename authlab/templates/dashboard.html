@@ -1,34 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — AuthLab{% endblock %}
+{% block title %}{{ t('dashboard.title') }}{% endblock %}
 {% block content %}
 <section class="page-head">
   <div>
-    <p class="eyebrow">Signed in with {{ user.session_method|replace('_', ' ') }}</p>
+    <p class="eyebrow">{{ t('dashboard.signed_in_with', method=user.session_method|method_label) }}</p>
     <h1>{{ user.username }}</h1>
-    <p class="lede">Session and credential state, straight from the database.</p>
+    <p class="lede">{{ t('dashboard.lede') }}</p>
   </div>
-  <span class="pill good">session active</span>
+  <span class="pill good">{{ t('dashboard.session_active') }}</span>
 </section>
 
-{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+{% if error %}<div class="flash error">{{ error|tr }}</div>{% endif %}
 {% if user.session_method == 'recovery_code' %}
   <div class="warn-box">
-    You are in a recovery session. Set a new password and rotate TOTP before
-    continuing.
+    {{ t('dashboard.recovery_warning') }}
     <form method="post" action="{{ url_for('recovery.recovery_change_password') }}" class="form inline-form">
-      <input name="password" type="password" placeholder="New password" required>
-      <input name="confirm" type="password" placeholder="Confirm" required>
-      <button class="btn primary small" type="submit">Set password</button>
+      <input name="password" type="password" placeholder="{{ t('dashboard.new_password') }}" required>
+      <input name="confirm" type="password" placeholder="{{ t('dashboard.confirm') }}" required>
+      <button class="btn primary small" type="submit">{{ t('dashboard.set_password') }}</button>
     </form>
   </div>
 {% endif %}
 
 <div class="grid two">
   <section class="card">
-    <h2>WebAuthn credentials</h2>
+    <h2>{{ t('dashboard.webauthn_credentials') }}</h2>
     {% if credentials %}
     <table class="table">
-      <thead><tr><th>Label</th><th>Kind</th><th>BE/BS</th><th>Counter</th><th>Last used</th><th></th></tr></thead>
+      <thead><tr><th>{{ t('table.label') }}</th><th>{{ t('table.kind') }}</th><th>{{ t('table.be_bs') }}</th><th>{{ t('table.counter') }}</th><th>{{ t('table.last_used') }}</th><th></th></tr></thead>
       <tbody>
       {% for c in credentials %}
         <tr>
@@ -36,11 +35,11 @@
           <td>{{ c.kind }}</td>
           <td>{{ 'BE' if c.backup_eligible else '—' }} / {{ 'BS' if c.backup_state else '—' }}</td>
           <td>{{ c.sign_count }}</td>
-          <td class="small muted">{{ c.last_used and (c.last_used|int) or 'never' }}</td>
+          <td class="small muted">{{ c.last_used and (c.last_used|int) or t('table.never') }}</td>
           <td>
             <form method="post" action="{{ url_for('passkeys.revoke_credential', credential_id=c.id) }}"
-                  onsubmit="return confirm('Revoke this credential?')">
-              <button class="linklike danger" type="submit">revoke</button>
+                  onsubmit='return confirm({{ t("dashboard.confirm_revoke")|tojson }})'>
+              <button class="linklike danger" type="submit">{{ t('dashboard.revoke') }}</button>
             </form>
           </td>
         </tr>
@@ -48,39 +47,38 @@
       </tbody>
     </table>
     {% else %}
-      <p class="muted">No WebAuthn credentials. Add one below.</p>
+      <p class="muted">{{ t('dashboard.no_credentials') }}</p>
     {% endif %}
     <div class="button-row">
-      <button id="dashboard-enroll-passkey" class="btn primary small" type="button">Add passkey</button>
-      <button id="dashboard-enroll-hardware" class="btn small" type="button">Add hardware key</button>
+      <button id="dashboard-enroll-passkey" class="btn primary small" type="button">{{ t('dashboard.add_passkey') }}</button>
+      <button id="dashboard-enroll-hardware" class="btn small" type="button">{{ t('dashboard.add_hardware') }}</button>
     </div>
     <div id="enroll-status" class="status" aria-live="polite"></div>
   </section>
 
   <section class="card">
-    <h2>Account recovery</h2>
-    <p><strong>{{ recovery_left }}</strong> unused recovery code(s).</p>
-    <p class="muted small">Recovery codes are a single-use fallback. After a
-       password reset, every session is revoked and TOTP is rotated.</p>
-    <a class="btn small" href="{{ url_for('recovery.recovery_home') }}">Open recovery</a>
+    <h2>{{ t('dashboard.account_recovery') }}</h2>
+    <p>{{ t('dashboard.recovery_left', n=recovery_left)|safe }}</p>
+    <p class="muted small">{{ t('dashboard.recovery_note') }}</p>
+    <a class="btn small" href="{{ url_for('recovery.recovery_home') }}">{{ t('dashboard.open_recovery') }}</a>
     <form method="post" action="{{ url_for('recovery.revoke_everything') }}"
-          onsubmit="return confirm('Revoke ALL credentials, codes, and sessions?')">
-      <button class="btn small danger" type="submit">Revoke everything</button>
+          onsubmit='return confirm({{ t("dashboard.confirm_revoke_all")|tojson }})'>
+      <button class="btn small danger" type="submit">{{ t('dashboard.revoke_everything') }}</button>
     </form>
   </section>
 </div>
 
 <section class="card">
-  <h2>Recent sessions</h2>
+  <h2>{{ t('dashboard.recent_sessions') }}</h2>
   <table class="table compact">
-    <thead><tr><th>Method</th><th>Created</th><th>Expires</th><th>State</th></tr></thead>
+    <thead><tr><th>{{ t('table.method') }}</th><th>{{ t('table.created') }}</th><th>{{ t('table.expires') }}</th><th>{{ t('table.state') }}</th></tr></thead>
     <tbody>
     {% for s in sessions %}
       <tr>
-        <td>{{ s.method }}</td>
+        <td>{{ s.method|method_label }}</td>
         <td class="small muted">{{ s.created_at|int }}</td>
         <td class="small muted">{{ s.expires_at|int }}</td>
-        <td>{{ 'revoked' if s.revoked else 'active' }}</td>
+        <td>{{ t('table.revoked') if s.revoked else t('table.active') }}</td>
       </tr>
     {% endfor %}
     </tbody>
@@ -88,14 +86,14 @@
 </section>
 
 <section class="card">
-  <h2>Audit log</h2>
+  <h2>{{ t('dashboard.audit_log') }}</h2>
   <table class="table compact">
-    <thead><tr><th>Event</th><th>Method</th><th>OK</th><th>Detail</th></tr></thead>
+    <thead><tr><th>{{ t('table.event') }}</th><th>{{ t('table.method') }}</th><th>{{ t('table.ok') }}</th><th>{{ t('table.detail') }}</th></tr></thead>
     <tbody>
     {% for a in audit %}
       <tr>
-        <td>{{ a.event }}</td>
-        <td>{{ a.method or '—' }}</td>
+        <td>{{ a.event|event_label }}</td>
+        <td>{{ a.method|method_label }}</td>
         <td>{{ '✓' if a.success else '✗' }}</td>
         <td class="small muted">{{ a.detail }}</td>
       </tr>

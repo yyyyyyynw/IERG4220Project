@@ -13,6 +13,7 @@ import os
 from flask import Flask, g, jsonify, request
 
 from .db import close_db, init_db
+from .i18n import event_label, locale_context, method_label, t, translate_message
 from .security import current_user
 
 
@@ -69,7 +70,13 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     @app.context_processor
     def inject_user():
-        return {"current_user": current_user()}
+        context = {"current_user": current_user(), "t": t}
+        context.update(locale_context())
+        return context
+
+    app.add_template_filter(translate_message, "tr")
+    app.add_template_filter(method_label, "method_label")
+    app.add_template_filter(event_label, "event_label")
 
     @app.after_request
     def security_headers(response):
